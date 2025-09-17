@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦁 Wildlife Detection Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="./wildlife-detector.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #2c5530; margin: 0; }
+        .upload-area { 
+            border: 3px dashed #667eea; 
+            padding: 40px; 
+            text-align: center; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover { background: #e8f2ff; border-color: #5a67d8; }
+        .upload-area.dragover { background: #ddd6fe; border-color: #8b5cf6; }
+        .result { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: #f0fff4; 
+            border-radius: 10px; 
+            border-left: 4px solid #48bb78;
+        }
+        .loading { color: #666; font-style: italic; }
+        .species { font-weight: bold; color: #2c5530; font-size: 18px; }
+        .confidence { color: #666; margin-left: 10px; }
+        .confidence.high { color: #48bb78; font-weight: bold; }
+        .confidence.medium { color: #ed8936; font-weight: bold; }
+        .confidence.low { color: #e53e3e; }
+        img { 
+            max-width: 100%; 
+            height: auto; 
+            margin: 10px 0; 
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #e2e8f0;
+        }
+        .prediction-item.high { border-left-color: #48bb78; }
+        .prediction-item.medium { border-left-color: #ed8936; }
+        .prediction-item.low { border-left-color: #e53e3e; }
+        .model-info {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .processing-time {
+            color: #718096;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦁 Wildlife Detection Demo</h1>
+            <p>Upload an image to detect wildlife species using AI</p>
+        </div>
+        
+        <div id="modelInfo" class="model-info">
+            <div>📥 Loading model...</div>
+        </div>
+        
+        <div class="upload-area" id="uploadArea">
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <p>🖼️ Click here or drag and drop an image</p>
+            <small>Supported formats: JPG, PNG, GIF</small>
+        </div>
+        
+        <div id="imageContainer"></div>
+        <div id="results"></div>
+    </div>
+    
+    <script>
+        const detector = new WildlifeDetector();
+        let modelLoaded = false;
+        
+        // Load model on page load
+        async function initializeModel() {
+            try {
+                console.log('🔄 Starting model initialization...');
+                
+                // Check if TensorFlow.js is loaded
+                if (typeof tf === 'undefined') {
+                    throw new Error('TensorFlow.js not loaded. Please check your internet connection.');
+                }
+                
+                console.log('✅ TensorFlow.js loaded successfully');
+                console.log('📋 Available backends:', tf.getBackend());
+                
+                // Test model file accessibility
+                console.log('🔍 Testing model file accessibility...');
+                const modelResponse = await fetch('./model.json');
+                if (!modelResponse.ok) {
+                    throw new Error(`Model file not accessible: ${modelResponse.status} ${modelResponse.statusText}`);
+                }
+                console.log('✅ Model file accessible');
+                
+                const metadataResponse = await fetch('./metadata.json');
+                if (!metadataResponse.ok) {
+                    throw new Error(`Metadata file not accessible: ${metadataResponse.status} ${metadataResponse.statusText}`);
+                }
+                console.log('✅ Metadata file accessible');
+                
+                const success = await detector.loadModel('./');
+                if (success) {
+                    modelLoaded = true;
+                    console.log('🎉 Model initialization completed successfully!');
+                    document.getElementById('modelInfo').innerHTML = `
+                        <div>✅ <strong>Model Loaded Successfully!</strong></div>
+                        <div>🎯 Species supported: ${Object.keys(detector.metadata.species_mapping).length}</div>
+                        <div>🧠 Model: ${detector.metadata.model_info.name}</div>
+                        <div>📊 Accuracy: ${Math.round(detector.metadata.model_info.accuracy * 100)}%</div>
+                        <div>🔧 Backend: ${tf.getBackend()}</div>
+                    `;
+                } else {
+                    throw new Error('Model loading returned false');
+                }
+            } catch (error) {
+                console.error('❌ Model loading error:', error);
+                console.error('Stack trace:', error.stack);
+                document.getElementById('modelInfo').innerHTML = `
+                    <div>❌ <strong>Error loading model:</strong></div>
+                    <div style="color: #e53e3e; font-size: 12px; margin-top: 5px;">${error.message}</div>
+                    <div style="color: #666; font-size: 11px; margin-top: 5px;">Check browser console for detailed error information.</div>
+                `;
+            }
+        }
+        
+        // Predict image
+        async function predict(imageElement) {
+            if (!modelLoaded) {
+                alert('Model not loaded yet! Please wait...');
+                return;
+            }
+            
+            document.getElementById('results').innerHTML = '<div class="result loading">🔍 Analyzing image...</div>';
+            
+            try {
+                const result = await detector.predict(imageElement, 5);
+                
+                // Display results
+                let resultsHTML = '<div class="result"><h3>🎯 Detection Results:</h3>';
+                
+                result.predictions.forEach((pred, i) => {
+                    resultsHTML += `
+                        <div class="prediction-item ${pred.confidenceLevel}">
+                            <span class="species">${i + 1}. ${pred.species}</span>
+                            <span class="confidence ${pred.confidenceLevel}">${pred.confidence}%</span>
+                        </div>
+                    `;
+                });
+                
+                resultsHTML += `<div class="processing-time">⚡ Processed in ${result.processingTime}ms</div>`;
+                resultsHTML += '</div>';
+                
+                document.getElementById('results').innerHTML = resultsHTML;
+                
+            } catch (error) {
+                console.error('Prediction error:', error);
+                document.getElementById('results').innerHTML = '<div class="result">❌ Error during prediction. Please try a different image.</div>';
+            }
+        }
+        
+        // File upload handling
+        document.getElementById('uploadArea').addEventListener('click', () => {
+            document.getElementById('imageInput').click();
+        });
+        
+        document.getElementById('imageInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        document.getElementById('imageContainer').innerHTML = '<img src="' + e.target.result + '">';
+                        predict(img);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('imageInput').files = files;
+                document.getElementById('imageInput').dispatchEvent(new Event('change'));
+            }
+        });
+        
+        // Initialize everything
+        initializeModel();
+    </script>
+</body>
+</html>
