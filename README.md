@@ -1,325 +1,333 @@
 # Wildlife Monitoring and Detection System 🦅
 
-A powerful AI-powered wildlife monitoring system that detects, classifies, and tracks animals using TensorFlow/Keras with a modern React frontend and Express backend.
-
-## 🌟 Features
-
-- **AI/ML Model**: TensorFlow.js integration for real-time wildlife classification
-- **Modern Frontend**: React + Vite with TailwindCSS for responsive design
-- **Robust Backend**: Express.js with MongoDB for data management
-- **Real-time Monitoring**: WebSocket support for live updates
-- **Interactive Maps**: Geolocation tracking of wildlife sightings
-- **Analytics Dashboard**: Charts and reports for monitoring data
-- **User Authentication**: Secure login system with JWT
-- **Dark Mode**: Toggle between light and dark themes
-- **Export Functionality**: Generate PDF/CSV reports
-- **Responsive Design**: Works on desktop and mobile devices
-
-## 🏗️ Tech Stack
-
-### Frontend
-- **React 18** with **Vite** for fast development
-- **TailwindCSS** for styling
-- **Recharts** for data visualization
-- **Leaflet.js** for interactive maps
-- **React Router** for navigation
-- **Axios** for API calls
-- **Socket.io Client** for real-time communication
-
-### Backend
-- **Node.js** with **Express.js**
-- **MongoDB** with **Mongoose** ODM
-- **JWT** for authentication
-- **Socket.io** for real-time communication
-- **Multer** for file uploads
-- **bcryptjs** for password hashing
-- **TensorFlow.js Node** for ML inference
-
-### AI/ML
-- **TensorFlow.js** for browser-based inference
-- **EfficientNet** models for image classification
-- **Sharp** for image preprocessing
-
-## 📁 Project Structure
-
-```
-wildlife-monitoring-system/
-├── backend/                 # Express.js backend
-│   ├── controllers/        # Route controllers
-│   ├── models/            # MongoDB models
-│   ├── routes/            # API routes
-│   ├── middleware/        # Custom middleware
-│   ├── services/          # Business logic services
-│   ├── uploads/           # File upload storage
-│   ├── Dockerfile         # Backend Docker configuration
-│   └── server.js          # Main server file
-├── frontend/              # React frontend
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── pages/         # Page components
-│   │   ├── hooks/         # Custom hooks
-│   │   ├── context/       # React contexts
-│   │   ├── utils/         # Utility functions
-│   │   └── styles/        # CSS files
-│   ├── public/            # Static assets
-│   ├── Dockerfile         # Frontend Docker configuration
-│   └── nginx.conf         # Nginx configuration
-├── ml-model/              # ML model files
-│   ├── models/            # Trained models
-│   └── scripts/           # Training scripts
-├── docker-compose.yml     # Docker Compose configuration
-├── deploy.sh              # Unix deployment script
-├── deploy.ps1             # Windows deployment script
-└── README.md              # Project documentation
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas)
-- Docker & Docker Compose (for containerized deployment)
-- Git
-
-### Option 1: Docker Deployment (Recommended)
-
-1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd wildlife-monitoring-system
-```
-
-2. **Deploy with Docker**
-
-For Windows (PowerShell):
-```powershell
-.\deploy.ps1
-```
-
-For Unix/Linux/Mac:
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
-
-3. **Access the Application**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000/api
-- MongoDB: localhost:27017
-
-### Option 2: Manual Development Setup
-
-1. **Setup Backend**
-```bash
-cd backend
-npm install
-cp .env.example .env
-# Edit .env with your configuration
-npm run dev
-```
-
-2. **Setup Frontend**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-3. **Setup MongoDB**
-- Install MongoDB locally or use MongoDB Atlas
-- Update the MONGODB_URI in backend/.env
-
-## 🔧 Configuration
-
-### Backend Environment Variables
-
-Create a `.env` file in the backend directory:
-
-```env
-PORT=5000
-NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/wildlife-monitoring
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRE=7d
-MAX_FILE_SIZE=10485760
-UPLOAD_PATH=./uploads
-CLIENT_URL=http://localhost:5173
-```
-
-### Frontend Environment Variables
-
-Create a `.env` file in the frontend directory:
-
-```env
-VITE_API_BASE_URL=http://localhost:5000/api
-```
-
-## 📱 Usage
-
-### Getting Started
-
-1. **Register/Login**: Create an account or login with existing credentials
-2. **Upload Images**: Upload wildlife images for AI classification
-3. **View Results**: See detected species with confidence scores
-4. **Monitor Dashboard**: Track wildlife activity with charts and maps
-5. **Export Reports**: Generate PDF or CSV reports of your data
-
-### Demo Credentials
-
-For testing purposes, you can use these demo credentials:
-- Email: demo@wildlifemonitor.com
-- Password: demo123
-
-### API Documentation
-
-The backend provides RESTful APIs for:
-
-#### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-- `POST /api/auth/verify-token` - Verify JWT token
-
-#### Users
-- `GET /api/users/profile` - Get user profile
-- `PUT /api/users/profile` - Update user profile
-- `PUT /api/users/preferences` - Update user preferences
-
-#### Detections
-- `POST /api/detections/analyze` - Upload and analyze image
-- `GET /api/detections` - Get user's detections
-- `GET /api/detections/:id` - Get single detection
-- `DELETE /api/detections/:id` - Delete detection
-- `PUT /api/detections/:id/verify` - Verify detection (admin/researcher)
-
-#### Analytics
-- `GET /api/analytics/dashboard` - Get dashboard analytics
-- `GET /api/analytics/species/:species` - Get species-specific analytics
-- `GET /api/analytics/heatmap` - Get location heatmap data
-- `GET /api/analytics/export` - Export analytics data
-
-## 🔌 Real-time Features
-
-The application uses Socket.io for real-time communication:
-
-### Socket Events
-- `detection-processing` - Image analysis started
-- `detection-completed` - Analysis completed with results
-- `detection-error` - Analysis failed
-- `rare-species-detected` - Rare species notification
-
-## 🧪 Development
-
-### Running Tests
-```bash
-# Backend tests
-cd backend
-npm test
-
-# Frontend tests
-cd frontend
-npm test
-```
-
-### Building for Production
-```bash
-# Backend
-cd backend
-npm run build
-
-# Frontend
-cd frontend
-npm run build
-```
-
-### Docker Commands
-
-```bash
-# Build and start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-
-# Rebuild services
-docker-compose build --no-cache
-```
-
-## 🚀 Deployment
-
-### Using Docker Compose
-The easiest way to deploy is using the provided Docker Compose configuration:
-
-```bash
-docker-compose up -d
-```
-
-### Manual Deployment
-
-1. **Deploy Backend**
-   - Use services like Heroku, Render, or AWS
-   - Set environment variables
-   - Connect to MongoDB Atlas
-
-2. **Deploy Frontend**
-   - Use services like Vercel, Netlify, or AWS S3
-   - Update API base URL
-   - Build and deploy
-
-3. **Database**
-   - Use MongoDB Atlas for production
-   - Set up proper indexes and security
-
-## 🔒 Security
-
-- JWT authentication for API access
-- Password hashing with bcrypt
-- Input validation and sanitization
-- File upload restrictions
-- CORS configuration
-- Rate limiting
-- Security headers
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## � License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- TensorFlow.js team for making ML accessible in the browser
-- EfficientNet model creators for excellent pre-trained models
-- Open source wildlife datasets for training data
-- React and Vite communities for amazing development tools
-- MongoDB team for the excellent database solution
-
-## 📞 Support
-
-If you have any questions or issues, please:
-1. Check the existing issues on GitHub
-2. Create a new issue with detailed description
-3. Join our community discussions
-
-## 🗺️ Roadmap
-
-- [ ] Mobile app development (React Native)
-- [ ] Advanced ML models (YOLO for object detection)
-- [ ] Video analysis capabilities
-- [ ] Multi-language support
-- [ ] Advanced analytics and reporting
-- [ ] Integration with wildlife databases
-- [ ] Camera trap integration
-- [ ] Automated species identification workflows
+A full-stack wildlife monitoring system with AI-powered image classification, real-time monitoring, and analytics. Built with React (Vite) frontend, Express.js backend, MongoDB storage, and TensorFlow.js models for inference.
+
+Highlights:
+- Real-time monitoring via Socket.IO
+- Image upload + AI analysis endpoint
+- Browser-optimized TensorFlow.js model included
+- Docker Compose for easy deployment
 
 ---
 
-Made with ❤️ for wildlife conservation
+## Table of Contents
+- Quick Start (Docker)
+- Local Development
+- Environment Variables
+- API Reference (health, auth, detections, analytics)
+- Real-time (Socket.IO)
+- ML Model (TensorFlow.js)
+- Database initialization & seeding
+- Project Layout
+- Troubleshooting
+- Contributing & License
+
+---
+
+## Quick Start (Docker, recommended)
+
+Prerequisites:
+- Docker & Docker Compose
+
+From the repository root:
+
+1. Build and start everything:
+```bash
+docker-compose up -d --build
+```
+
+2. Services (default ports):
+- Frontend (Nginx): http://localhost:3000
+- Backend API: http://localhost:5000/api
+- MongoDB: mongodb://localhost:27017 (container exposes 27017)
+
+3. View logs:
+```bash
+docker-compose logs -f
+```
+
+4. Stop services:
+```bash
+docker-compose down
+```
+
+Notes:
+- The backend container exposes the API at /api (see server routes).
+- docker-compose mounts a volume for MongoDB and for backend/uploads (uploaded files persist on host).
+
+---
+
+## Local Development
+
+Backend
+1. Install dependencies
+```bash
+cd backend
+npm install
+```
+
+2. Recommended start (ensures model load + DB connection):
+```bash
+# Use startup script which connects to MongoDB and loads the model before starting server
+node startup.js
+```
+Alternatively if you prefer direct start:
+```bash
+node server.js
+```
+
+Frontend
+1. Install dependencies
+```bash
+cd frontend
+npm install
+```
+
+2. Start dev server (Vite)
+```bash
+npm run dev
+# open http://localhost:5173 (Vite default) — app may be served at this dev port
+```
+
+Notes:
+- In Docker the frontend is built and served by Nginx on port 3000. For local dev Vite commonly runs on 5173.
+
+---
+
+## Environment Variables
+
+Backend (.env in backend/)
+
+Required (startup.js checks these):
+- MONGODB_URI - MongoDB connection string (e.g. mongodb://admin:password@localhost:27017/wildlife-monitoring?authSource=admin)
+- JWT_SECRET - JWT signing secret
+- PORT - API port (default 5000)
+
+Typical example:
+```
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/wildlife-monitoring
+JWT_SECRET=super-secret-change-this
+JWT_EXPIRE=7d
+CLIENT_URL=http://localhost:3000
+```
+
+Frontend (.env in frontend/)
+```
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+
+Docker Compose config sets reasonable defaults for local containerized usage (see docker-compose.yml).
+
+---
+
+## API Reference
+
+Base URL (example): http://localhost:5000/api
+
+All responses use JSON and a standard envelope { success, message, data } where applicable.
+
+Health
+- GET /api/health
+  - Basic health & diagnostics
+
+Example:
+```bash
+curl http://localhost:5000/api/health
+```
+
+Authentication
+- POST /api/auth/register
+  - Body: { username, email, password, firstName, lastName, organization?, location? }
+- POST /api/auth/login
+  - Body: { email, password }
+- POST /api/auth/verify-token
+  - Body: { token }
+
+Register example:
+```bash
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"alice","email":"alice@example.com","password":"secret123","firstName":"Alice","lastName":"Smith"}'
+```
+
+Login example:
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alice@example.com","password":"secret123"}'
+```
+
+Token verify example:
+```bash
+curl -X POST http://localhost:5000/api/auth/verify-token \
+  -H "Content-Type: application/json" \
+  -d '{"token":"<JWT_TOKEN_HERE>"}'
+```
+
+Detections (requires Authorization: Bearer <token>)
+- POST /api/detections/analyze
+  - Upload and analyze an image. Accepts multipart/form-data with file field produced by middleware uploadSingle.
+  - Optional fields: location (JSON string), metadata (JSON string)
+
+Analyze (file upload) example:
+```bash
+curl -X POST "http://localhost:5000/api/detections/analyze" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -F "image=@/path/to/photo.jpg" \
+  -F 'metadata={"timeOfDay":"morning","source":"upload"}'
+```
+
+- GET /api/detections
+  - List user's detections (paginated depending on implementation)
+- GET /api/detections/:id
+- PUT /api/detections/:id/verify
+- DELETE /api/detections/:id
+
+Analytics (requires Authorization)
+- GET /api/analytics/dashboard
+- GET /api/analytics/species/:species
+- GET /api/analytics/heatmap
+- GET /api/analytics/export
+
+Note: There are debug/test routes available:
+- GET /api/test/analytics/dashboard — returns sample analytics payload
+- POST /api/test/login — returns a mock token & user for quick testing
+- POST /api/test/camera-upload — returns a sample camera-detection payload
+
+---
+
+## Real-time (Socket.IO)
+
+Backend exposes a Socket.IO server with the following behaviors:
+- Origin is restricted to CLIENT_URL (env) by default.
+- Events:
+  - Client -> Server: 'join-monitoring' (payload: userId) — join a "user-{userId}" room
+  - Server -> Client: custom events you should listen for, e.g. 'detection-completed', 'detection-processing', 'rare-species-detected' (server emits these during workflows)
+
+Client example (browser with socket.io-client):
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:5000", { transports: ['websocket'] });
+
+socket.on('connect', () => {
+  console.log('connected', socket.id);
+  socket.emit('join-monitoring', 'user-123'); // join a room
+});
+
+socket.on('detection-completed', (payload) => {
+  console.log('detection completed', payload);
+});
+```
+
+---
+
+## ML Model (TensorFlow.js)
+
+A browser-optimized TFJS model is included at:
+ml-model/models/web_optimized/current_model/
+
+Files include:
+- model.json, *.bin (weights)
+- metadata.json
+- wildlife-detector.js — helper class that wraps model loading, preprocessing and prediction
+
+Usage example in browser (wildlife-detector.js expects tf to be loaded):
+```html
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+<script src="/ml-model/current_model/wildlife-detector.js"></script>
+<script>
+  (async () => {
+    const detector = new WildlifeDetector();
+    const ok = await detector.loadModel('/ml-model/current_model/');
+    if (!ok) { console.error('Model failed to load'); return; }
+    const imgEl = document.getElementById('photo');
+    const result = await detector.predict(imgEl, 5);
+    console.log(result.topPrediction);
+  })();
+</script>
+```
+
+Notes:
+- The backend also serves the ml-model directory as a static asset (server.js: app.use('/ml-model', express.static('../ml-model'))), so the model is available under /ml-model/... when the backend is running.
+
+---
+
+## Database initialization & seeding
+
+The repository includes a mongo initialization script used by the MongoDB container:
+- backend/mongo-init.js
+  - Creates collections (users, detections, species)
+  - Creates several indexes for performance
+  - Inserts sample species records (e.g. African Elephant, Bengal Tiger, etc.)
+
+If you run MongoDB outside Docker, you can manually run mongo-init.js using the mongo shell or replicate the actions using MongoDB tools.
+
+---
+
+## Project Layout (high level)
+- backend/ — Express server, routes, models, services, Dockerfile
+- frontend/ — React (Vite) frontend, Dockerfile, nginx config
+- ml-model/ — TensorFlow.js models and helper scripts
+- docker-compose.yml — orchestration (mongodb, backend, frontend)
+
+Key backend entry points:
+- server.js — creates Express app, initializes Socket.IO and mounts API routes
+- startup.js — convenience startup flow: validates env, connects to MongoDB, loads world model then requires server.js
+
+Important models:
+- backend/models/WildlifeDetection.js — advanced schema used for storing detection records including geolocation, confidence, behavior, conservation flags and indexes for geo + time queries
+
+---
+
+## Troubleshooting & Tips
+
+- MongoDB connection errors:
+  - Ensure MONGODB_URI is correct and that MongoDB is reachable.
+  - If using Docker compose, check the mongodb container logs and that service depends_on is satisfied.
+
+- Model loading failures:
+  - startup.js attempts to load model on startup — if model files are missing, startup will fail. Confirm ml-model/models/web_optimized/current_model/* exists.
+  - For browser-based model failing to load, open the dev console and inspect fetch errors for metadata.json/model.json.
+
+- CORS / CLIENT_URL:
+  - The backend restricts allowed origins via CLIENT_URL. Update env to include your frontend host.
+
+- File uploads:
+  - Uploaded images are stored in backend/uploads (mounted in docker-compose). Ensure disk space and permissions are correct.
+
+- Running backend locally:
+  - Use node startup.js so the model is loaded before server startup (startup.js performs checks and model load).
+
+---
+
+## Contributing
+
+1. Fork the repo
+2. Create a branch: git checkout -b feature/your-feature
+3. Commit: git commit -m "Add awesome feature"
+4. Push: git push origin feature/your-feature
+5. Open a Pull Request
+
+Please include tests and keep changes scoped.
+
+---
+
+## License
+
+This repository is provided under the MIT License (check LICENSE file in the repo). If there is no LICENSE file, please treat repository as "All rights reserved" until a license is added.
+
+---
+
+## Contact / Support
+
+If you find issues or want to contribute:
+- Open an issue on the repository
+- Provide reproduction steps & logs for problems
+- Tag maintainers or send a PR to fix small issues
+
+---
+
+Thanks for checking out the Wildlife Monitoring and Detection System — built to assist conservation, research and real-time monitoring with modern web and ML technologies. Contributions and feedback are welcome!
